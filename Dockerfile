@@ -1,4 +1,98 @@
-FROM buildkite/agent:3
+FROM buildkite/agent:3-ubuntu as agent
+FROM outstand/tini as tini
+
+FROM buildpack-deps:buster
 LABEL maintainer="Ryan Schlesinger <ryan@outstand.com>"
 
+COPY --from=tini /sbin/tini /sbin/
 
+# COPIED FROM ruby:2.5.1-alpine3.7
+# install things globally, for great justice
+# and don't create ".bundle" in all our apps
+ENV GEM_HOME /usr/local/bundle
+ENV BUNDLE_PATH="$GEM_HOME" \
+	BUNDLE_SILENCE_ROOT_WARNING=1 \
+	BUNDLE_APP_CONFIG="$GEM_HOME"
+# path recommendation: https://github.com/bundler/bundler/pull/6469#issuecomment-383235438
+ENV PATH $GEM_HOME/bin:$BUNDLE_PATH/gems/bin:$PATH
+# adjust permissions of a few directories for running "gem install" as an arbitrary user
+RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
+# (BUNDLE_PATH = GEM_HOME, no need to mkdir/chown both)
+
+ENV DOCKER_COMPOSE_VERSION 1.27.4
+
+RUN groupadd -g 1000 --system ci && \
+    useradd -u 1000 -g ci -ms /bin/bash --system ci && \
+    groupadd -g 1101 docker && \
+    usermod -a -G docker ci && \
+    apt-get update && apt-get install -y --no-install-recommends \
+      zsh \
+      jq \
+      ruby \
+      ruby-bundler \
+      python3-dev \
+      python3-setuptools \
+      python3-pip \
+      apt-transport-https \
+      gnupg-agent \
+      software-properties-common \
+      perl \
+      openssh-client \
+      rsync \
+    && rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+    add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/debian \
+    $(lsb_release -cs) \
+    stable" && \
+    apt-get update && apt-get install -y --no-install-recommends \
+      docker-ce \
+      docker-ce-cli \
+      containerd.io \
+    && rm -rf /var/lib/apt/lists/* && \
+    pip3 install docker-compose==${DOCKER_COMPOSE_VERSION} && \
+    echo 'source /etc/profile' > /home/ci/.bashrc && \
+    echo 'source /etc/profile' > /home/ci/.bash_profile && \
+    echo 'source /etc/profile' > /root/.bashrc && \
+    echo 'source /etc/profile' > /root/.bash_profile && \
+    echo 'export FIXUID=$(id -u) \n\
+          export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
+    chown ci:ci /srv
+
+ENV GIT_LFS_VERSION 2.12.0
+ENV GIT_LFS_HASH f9befd0fa0b19517b8ed14ab07812f0d39d776d8c9ea0023e343e30ff300813f
+RUN mkdir -p /tmp/build && cd /tmp/build \
+  && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
+  && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
+  && tar -xzf git-lfs.tgz \
+  && cp git-lfs /usr/local/bin/ \
+  && cd / && rm -rf /tmp/build \
+  && git lfs install --system
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+      unzip awscliv2.zip && \
+      ./aws/install && \
+      rm awscliv2.zip
+
+ENV BUILDKITE_AGENT_CONFIG=/buildkite/buildkite-agent.cfg \
+    PATH="/usr/local/bin:${PATH}"
+
+RUN mkdir -p /buildkite/builds /buildkite/hooks /buildkite/plugins \
+    && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
+    && chmod +x /usr/local/bin/ssh-env-config.sh \
+    && chown -R ci:ci /buildkite
+
+COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
+COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+
+USER ci
+
+ENV BUNDLER_VERSION 2.1.4
+RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
+
+
+VOLUME /buildkite
+ENTRYPOINT ["/docker-entrypoint.sh"]
+# ENTRYPOINT ["/sbin/tini", "-g", "--", "/docker-entrypoint.sh"]
+CMD ["start"]
