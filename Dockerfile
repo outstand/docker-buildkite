@@ -23,7 +23,7 @@ ENV DOCKER_COMPOSE_VERSION 1.27.4
 
 RUN groupadd -g 1000 --system ci && \
     useradd -u 1000 -g ci -ms /bin/bash --system ci && \
-    groupadd -g 1101 docker && \
+    groupadd -g 900 docker && \
     usermod -a -G docker ci && \
     apt-get update && apt-get install -y --no-install-recommends \
       zsh \
