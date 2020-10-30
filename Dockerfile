@@ -74,6 +74,15 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
       ./aws/install && \
       rm awscliv2.zip
 
+ENV BUILDKIT_VERSION v0.7.2
+RUN cd /usr/local/bin && \
+      wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
+      tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
+      chmod +x buildctl buildkit-runc buildkitd&& \
+      rm -f buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz
+
+ENV DOCKER_CLI_EXPERIMENTAL=enabled
+
 ENV BUILDKITE_AGENT_CONFIG=/buildkite/buildkite-agent.cfg \
     PATH="/usr/local/bin:${PATH}"
 
