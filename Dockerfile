@@ -1,10 +1,12 @@
 FROM buildkite/agent:3-ubuntu as agent
 FROM outstand/tini as tini
+FROM outstand/su-exec as su-exec
 
 FROM buildpack-deps:buster
 LABEL maintainer="Ryan Schlesinger <ryan@outstand.com>"
 
 COPY --from=tini /sbin/tini /sbin/
+COPY --from=su-exec /sbin/su-exec /sbin/
 
 # COPIED FROM ruby:2.5.1-alpine3.7
 # install things globally, for great justice
@@ -81,27 +83,29 @@ RUN cd /usr/local/bin && \
       chmod +x buildctl buildkit-runc buildkitd&& \
       rm -f buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz
 
-ENV DOCKER_CLI_EXPERIMENTAL=enabled
-
-ENV BUILDKITE_AGENT_CONFIG=/buildkite/buildkite-agent.cfg \
-    PATH="/usr/local/bin:${PATH}"
-
-RUN mkdir -p /buildkite/builds /buildkite/hooks /buildkite/plugins \
-    && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
-    && chmod +x /usr/local/bin/ssh-env-config.sh \
-    && chown -R ci:ci /buildkite
-
-COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
-COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-
 USER ci
 
 ENV BUNDLER_VERSION 2.1.4
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
+USER root
 
-VOLUME /buildkite
+ENV DOCKER_CLI_EXPERIMENTAL=enabled
+
+ENV BUILDKITE_AGENT_CONFIG=/buildkite/buildkite-agent.cfg \
+    PATH="/usr/local/bin:${PATH}"
+
+RUN mkdir -p /var/lib/buildkite/builds /var/lib/buildkite/hooks /var/lib/buildkite/plugins \
+    && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
+    && chmod +x /usr/local/bin/ssh-env-config.sh \
+    && chown -R ci:ci /var/lib/buildkite
+
+COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
+COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+
+
+VOLUME /var/lib/buildkite
 ENTRYPOINT ["/docker-entrypoint.sh"]
 # ENTRYPOINT ["/sbin/tini", "-g", "--", "/docker-entrypoint.sh"]
 CMD ["start"]
