@@ -41,6 +41,7 @@ RUN groupadd -g 1000 --system ci && \
       perl \
       openssh-client \
       rsync \
+      less \
     && rm -rf /var/lib/apt/lists/* && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     add-apt-repository \
