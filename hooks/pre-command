@@ -1,0 +1,5 @@
+#!/bin/bash
+set -eou pipefail
+
+export FIXUID=$(id -u)
+export FIXGID=$(id -g)

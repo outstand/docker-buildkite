@@ -103,6 +103,7 @@ RUN mkdir -p /var/lib/buildkite/builds /var/lib/buildkite/hooks /var/lib/buildki
 
 COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
 COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
+COPY hooks/pre-command /var/lib/buildkite/hooks/
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 
