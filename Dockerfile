@@ -96,14 +96,15 @@ ENV DOCKER_CLI_EXPERIMENTAL=enabled
 ENV BUILDKITE_AGENT_CONFIG=/buildkite/buildkite-agent.cfg \
     PATH="/usr/local/bin:${PATH}"
 
-RUN mkdir -p /var/lib/buildkite/builds /var/lib/buildkite/hooks /var/lib/buildkite/plugins \
+RUN mkdir -p /var/lib/buildkite/builds /buildkite/hooks /var/lib/buildkite/plugins \
     && curl -Lfs -o /usr/local/bin/ssh-env-config.sh https://raw.githubusercontent.com/buildkite/docker-ssh-env-config/master/ssh-env-config.sh \
     && chmod +x /usr/local/bin/ssh-env-config.sh \
-    && chown -R ci:ci /var/lib/buildkite
+    && chown -R ci:ci /var/lib/buildkite \
+    && chown -R ci:ci /buildkite
 
 COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
 COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
-COPY hooks/pre-command /var/lib/buildkite/hooks/
+COPY hooks/pre-command /buildkite/hooks/
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 
