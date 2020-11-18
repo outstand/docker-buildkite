@@ -1,4 +1,4 @@
-FROM buildkite/agent:3-ubuntu as agent
+FROM buildkite/agent:3.25.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
