@@ -22,4 +22,7 @@ if [ "$1" = 'bash' ]; then
   exec /bin/bash
 fi
 
+task_id=$(curl -fs ${ECS_CONTAINER_METADATA_URI_V4}/task | jq -r '.TaskARN | split("/") | last')
+export BUILDKITE_AGENT_TAGS="ecs:task_id=${task_id}"
+
 exec /sbin/tini -g -- su-exec ci ssh-env-config.sh /usr/local/bin/buildkite-agent "$@"
