@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.25.0-ubuntu as agent
+FROM buildkite/agent:3.26.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -42,6 +42,7 @@ RUN groupadd -g 1000 --system ci && \
       openssh-client \
       rsync \
       less \
+      zstd \
     && rm -rf /var/lib/apt/lists/* && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     add-apt-repository \
@@ -62,8 +63,8 @@ RUN groupadd -g 1000 --system ci && \
           export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
     chown ci:ci /srv
 
-ENV GIT_LFS_VERSION 2.12.0
-ENV GIT_LFS_HASH f9befd0fa0b19517b8ed14ab07812f0d39d776d8c9ea0023e343e30ff300813f
+ENV GIT_LFS_VERSION 2.12.1
+ENV GIT_LFS_HASH f1ad07284dfdefaca96fbd047b804dd95731332c90ae79acc30a5ab575a42c5c
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
