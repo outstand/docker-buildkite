@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.26.0-ubuntu as agent
+FROM buildkite/agent:3.28.1-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -21,7 +21,7 @@ ENV PATH $GEM_HOME/bin:$BUNDLE_PATH/gems/bin:$PATH
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 # (BUNDLE_PATH = GEM_HOME, no need to mkdir/chown both)
 
-ENV DOCKER_COMPOSE_VERSION 1.27.4
+ENV DOCKER_COMPOSE_VERSION 1.28.6
 
 RUN groupadd -g 1000 --system ci && \
     useradd -u 1000 -g ci -ms /bin/bash --system ci && \
@@ -35,6 +35,9 @@ RUN groupadd -g 1000 --system ci && \
       python3-dev \
       python3-setuptools \
       python3-pip \
+      python3-wheel \
+      rustc \
+      cargo \
       apt-transport-https \
       gnupg-agent \
       software-properties-common \
@@ -63,8 +66,8 @@ RUN groupadd -g 1000 --system ci && \
           export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
     chown ci:ci /srv
 
-ENV GIT_LFS_VERSION 2.12.1
-ENV GIT_LFS_HASH f1ad07284dfdefaca96fbd047b804dd95731332c90ae79acc30a5ab575a42c5c
+ENV GIT_LFS_VERSION 2.13.3
+ENV GIT_LFS_HASH 03197488f7be54cfc7b693f0ed6c75ac155f5aaa835508c64d68ec8f308b04c1
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
@@ -84,7 +87,7 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
         boundary \
       && rm -rf /var/lib/apt/lists/*
 
-ENV BUILDKIT_VERSION v0.7.2
+ENV BUILDKIT_VERSION v0.8.2
 RUN cd /usr/local/bin && \
       wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
       tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
@@ -93,7 +96,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.1.4
+ENV BUNDLER_VERSION 2.2.15
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
