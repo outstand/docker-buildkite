@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.29.0-ubuntu as agent
+FROM buildkite/agent:3.30.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -96,7 +96,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.2.17
+ENV BUNDLER_VERSION 2.2.19
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
@@ -120,5 +120,4 @@ COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 VOLUME /var/lib/buildkite
 ENTRYPOINT ["/docker-entrypoint.sh"]
-# ENTRYPOINT ["/sbin/tini", "-g", "--", "/docker-entrypoint.sh"]
 CMD ["start"]
