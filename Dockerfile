@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.31.0-ubuntu as agent
+FROM buildkite/agent:3.32.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -87,7 +87,7 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
         boundary \
       && rm -rf /var/lib/apt/lists/*
 
-ENV BUILDKIT_VERSION v0.8.3
+ENV BUILDKIT_VERSION v0.9.0
 RUN cd /usr/local/bin && \
       wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
       tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
@@ -96,7 +96,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.2.24
+ENV BUNDLER_VERSION 2.2.25
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
