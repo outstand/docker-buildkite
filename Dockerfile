@@ -1,8 +1,8 @@
-FROM buildkite/agent:3.32.3-ubuntu as agent
+FROM buildkite/agent:3.33.3-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
-FROM buildpack-deps:buster
+FROM buildpack-deps:bullseye
 LABEL maintainer="Ryan Schlesinger <ryan@outstand.com>"
 
 COPY --from=tini /sbin/tini /sbin/
@@ -21,8 +21,6 @@ ENV PATH $GEM_HOME/bin:$BUNDLE_PATH/gems/bin:$PATH
 RUN mkdir -p "$GEM_HOME" && chmod 777 "$GEM_HOME"
 # (BUNDLE_PATH = GEM_HOME, no need to mkdir/chown both)
 
-ENV DOCKER_COMPOSE_VERSION 1.29.2
-
 RUN groupadd -g 1000 --system ci && \
     useradd -u 1000 -g ci -ms /bin/bash --system ci && \
     groupadd -g 900 docker && \
@@ -32,10 +30,6 @@ RUN groupadd -g 1000 --system ci && \
       jq \
       ruby \
       ruby-bundler \
-      python3-dev \
-      python3-setuptools \
-      python3-pip \
-      python3-wheel \
       rustc \
       cargo \
       apt-transport-https \
@@ -56,8 +50,17 @@ RUN groupadd -g 1000 --system ci && \
       docker-ce \
       docker-ce-cli \
       containerd.io \
-    && rm -rf /var/lib/apt/lists/* && \
-    pip3 install docker-compose==${DOCKER_COMPOSE_VERSION} && \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV DOCKER_COMPOSE_VERSION 2.0.1
+ENV COMPOSE_SWITCH_VERSION 1.0.2
+
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
+    curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
+    chmod +x /usr/local/bin/compose-switch && \
+    update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99 && \
     echo 'source /etc/profile' > /home/ci/.bashrc && \
     echo 'source /etc/profile' > /home/ci/.bash_profile && \
     echo 'source /etc/profile' > /root/.bashrc && \
@@ -66,8 +69,8 @@ RUN groupadd -g 1000 --system ci && \
           export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
     chown ci:ci /srv
 
-ENV GIT_LFS_VERSION 2.13.3
-ENV GIT_LFS_HASH 03197488f7be54cfc7b693f0ed6c75ac155f5aaa835508c64d68ec8f308b04c1
+ENV GIT_LFS_VERSION 3.0.1
+ENV GIT_LFS_HASH 29706bf26d26a4e3ddd0cad02a1d05ff4f332a2fab4ecab3bbffbb000d6a5797
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
@@ -87,7 +90,7 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
         boundary \
       && rm -rf /var/lib/apt/lists/*
 
-ENV BUILDKIT_VERSION v0.9.0
+ENV BUILDKIT_VERSION v0.9.1
 RUN cd /usr/local/bin && \
       wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
       tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
@@ -96,7 +99,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.2.27
+ENV BUNDLER_VERSION 2.2.30
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
