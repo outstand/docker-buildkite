@@ -12,6 +12,7 @@ chown_r_dir() {
 }
 
 chown_r_dir /var/lib/buildkite
+mkdir -p /var/lib/buildkite-agent
 chown_r_dir /var/lib/buildkite-agent
 
 if [[ ! -x /var/lib/buildkite-agent/buildkite-agent ]]; then

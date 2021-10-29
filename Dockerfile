@@ -56,7 +56,7 @@ ENV DOCKER_COMPOSE_VERSION 2.0.1
 ENV COMPOSE_SWITCH_VERSION 1.0.2
 
 RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
-    curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
     chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
     curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
     chmod +x /usr/local/bin/compose-switch && \
