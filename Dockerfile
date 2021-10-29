@@ -30,6 +30,10 @@ RUN groupadd -g 1000 --system ci && \
       jq \
       ruby \
       ruby-bundler \
+      python3-dev \
+      python3-setuptools \
+      python3-pip \
+      python3-wheel \
       rustc \
       cargo \
       apt-transport-https \
@@ -52,15 +56,17 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKER_COMPOSE_VERSION 2.0.1
-ENV COMPOSE_SWITCH_VERSION 1.0.2
+ENV DOCKER_COMPOSE_VERSION 1.29.2
+# ENV DOCKER_COMPOSE_VERSION 2.0.1
+# ENV COMPOSE_SWITCH_VERSION 1.0.2
 
-RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
-    curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
-    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
-    curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
-    chmod +x /usr/local/bin/compose-switch && \
-    update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99 && \
+# RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+#     curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+#     chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
+#     curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
+#     chmod +x /usr/local/bin/compose-switch && \
+#     update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99 && \
+RUN pip3 install docker-compose==${DOCKER_COMPOSE_VERSION} && \
     echo 'source /etc/profile' > /home/ci/.bashrc && \
     echo 'source /etc/profile' > /home/ci/.bash_profile && \
     echo 'source /etc/profile' > /root/.bashrc && \
