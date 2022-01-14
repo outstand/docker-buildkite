@@ -52,20 +52,21 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKER_COMPOSE_VERSION 1.29.2
-# ENV DOCKER_COMPOSE_VERSION 2.0.1
-# ENV COMPOSE_SWITCH_VERSION 1.0.2
+# ENV DOCKER_COMPOSE_VERSION 1.29.2
+ENV DOCKER_COMPOSE_VERSION 2.2.3
+ENV COMPOSE_SWITCH_VERSION 1.0.4
 
-# RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
-#     curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
-#     chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
-#     curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
-#     chmod +x /usr/local/bin/compose-switch && \
-#     update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99 && \
-# RUN pip3 install docker-compose==${DOCKER_COMPOSE_VERSION} && \
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    curl -L "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose && \
+    curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
+    chmod +x /usr/local/bin/compose-switch && \
+    update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99
 
-RUN curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose && \
-    chmod +x /usr/local/bin/docker-compose
+# RUN pip3 install docker-compose==${DOCKER_COMPOSE_VERSION}
+
+# RUN curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose && \
+#     chmod +x /usr/local/bin/docker-compose
 
 RUN echo 'source /etc/profile' > /home/ci/.bashrc && \
     echo 'source /etc/profile' > /home/ci/.bash_profile && \
@@ -75,8 +76,8 @@ RUN echo 'source /etc/profile' > /home/ci/.bashrc && \
           export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
     chown ci:ci /srv
 
-ENV GIT_LFS_VERSION 3.0.1
-ENV GIT_LFS_HASH 29706bf26d26a4e3ddd0cad02a1d05ff4f332a2fab4ecab3bbffbb000d6a5797
+ENV GIT_LFS_VERSION 3.0.2
+ENV GIT_LFS_HASH 
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
@@ -96,7 +97,7 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
         boundary \
       && rm -rf /var/lib/apt/lists/*
 
-ENV BUILDKIT_VERSION v0.9.1
+ENV BUILDKIT_VERSION v0.9.3
 RUN cd /usr/local/bin && \
       wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
       tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
@@ -105,7 +106,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.2.30
+ENV BUNDLER_VERSION 2.3.5
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
