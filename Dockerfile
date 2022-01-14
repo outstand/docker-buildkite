@@ -77,7 +77,7 @@ RUN echo 'source /etc/profile' > /home/ci/.bashrc && \
     chown ci:ci /srv
 
 ENV GIT_LFS_VERSION 3.0.2
-ENV GIT_LFS_HASH 
+ENV GIT_LFS_HASH 796f5ea0259eabe57f94a8ad1bb0d46806168df30b135a65d88f8a7ee1409e0b
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
