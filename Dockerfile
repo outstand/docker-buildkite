@@ -127,6 +127,7 @@ COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
 COPY hooks/pre-command /buildkite/hooks/
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
+ENV BUILDKIT_PROGRESS plain
 
 VOLUME /var/lib/buildkite
 ENTRYPOINT ["/docker-entrypoint.sh"]
