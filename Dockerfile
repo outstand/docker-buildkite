@@ -119,10 +119,10 @@ RUN mkdir -p /var/lib/buildkite/builds /buildkite/hooks /var/lib/buildkite/plugi
 COPY ./buildkite-agent.cfg /buildkite/buildkite-agent.cfg
 COPY --from=agent /usr/local/bin/buildkite-agent /usr/local/bin/buildkite-agent
 COPY hooks/pre-command /buildkite/hooks/
-COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV BUILDKIT_PROGRESS plain
 
 VOLUME /var/lib/buildkite
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["start"]
