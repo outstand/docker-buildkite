@@ -2,7 +2,7 @@ FROM buildkite/agent:3.33.3-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
-FROM buildpack-deps:buster
+FROM buildpack-deps:bullseye
 LABEL maintainer="Ryan Schlesinger <ryan@outstand.com>"
 
 COPY --from=tini /sbin/tini /sbin/
@@ -52,7 +52,6 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-# ENV DOCKER_COMPOSE_VERSION 1.29.2
 ENV DOCKER_COMPOSE_VERSION 2.2.3
 ENV COMPOSE_SWITCH_VERSION 1.0.4
 
@@ -62,11 +61,6 @@ RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
     curl -fL https://github.com/docker/compose-switch/releases/download/v${COMPOSE_SWITCH_VERSION}/docker-compose-linux-amd64 -o /usr/local/bin/compose-switch && \
     chmod +x /usr/local/bin/compose-switch && \
     update-alternatives --install /usr/local/bin/docker-compose docker-compose /usr/local/bin/compose-switch 99
-
-# RUN pip3 install docker-compose==${DOCKER_COMPOSE_VERSION}
-
-# RUN curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose && \
-#     chmod +x /usr/local/bin/docker-compose
 
 RUN echo 'source /etc/profile' > /home/ci/.bashrc && \
     echo 'source /etc/profile' > /home/ci/.bash_profile && \
