@@ -18,6 +18,8 @@ docker run --rm \
 This image is based on https://hub.docker.com/r/buildkite/agent but adapted to run as a non-root user and in an selinux hardened environment (bottlerocket).
 
 Additionally, we've added standard tools for ruby and rust along with the following:
+- tini
+- su-exec
 - zsh
 - jq
 - rsync
