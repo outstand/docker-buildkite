@@ -1,4 +1,4 @@
-# Buildkite!
+# Buildkite Agent
 
 ## Usage
 
