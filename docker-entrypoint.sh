@@ -36,9 +36,23 @@ if [ -n "${ECS_CONTAINER_METADATA_URI_V4:-}" ]; then
   tags+=("ecs:task_id=${task_id}")
 fi
 
+# Extracts params based on https://www.freedesktop.org/software/systemd/man/os-release.html
+host_os_release_param() {
+  local param="$1"
+
+  echo $(cat /etc/host-os-release | grep "^${param}=" | cut -d = -f 2 | tr -d '"')
+}
+
 if [ -f /etc/host-os-release ]; then
-  host_os_version=$(cat /etc/host-os-release | grep VERSION_ID | cut -d = -f 2)
-  tags+=("host:os_version=${host_os_version}")
+  os_id=$(host_os_release_param "ID")
+  if [ -n "$os_id" ]; then
+    tags+=("host:os_id=${os_id}")
+  fi
+
+  os_version=$(host_os_release_param "VERSION_ID")
+  if [ -n "$os_version" ]; then
+    tags+=("host:os_version=${os_version}")
+  fi
 fi
 
 if [[ ${#tags[@]} -gt 0 ]] ; then
