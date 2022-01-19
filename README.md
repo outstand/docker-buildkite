@@ -3,14 +3,14 @@
 ## Usage
 
 ```sh
-docker run --rm /buildkite/agent:3 help
+docker run --rm public.ecr.aws/a5k7g6j4/buildkite-agent:3 help
 
 docker run --rm \
 -v /etc/os-release:/etc/host-os-release:ro \
 -v /var/lib/buildkite-agent:/var/lib/buildkite-agent \
 -v /var/lib/buildkite:/var/lib/buildkite \
 -v /var/run/docker.sock:/var/run/docker.sock \
-/buildkite/agent:3
+public.ecr.aws/a5k7g6j4/buildkite-agent:3
 ```
 
 ## About
