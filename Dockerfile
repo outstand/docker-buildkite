@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.33.3-ubuntu as agent
+FROM buildkite/agent:3.34.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -52,7 +52,7 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKER_COMPOSE_VERSION 2.2.3
+ENV DOCKER_COMPOSE_VERSION 2.3.3
 ENV COMPOSE_SWITCH_VERSION 1.0.4
 
 RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
@@ -70,8 +70,8 @@ RUN echo 'source /etc/profile' > /home/ci/.bashrc && \
           export FIXGID=$(id -g)' > /etc/profile.d/fixuid.sh && \
     chown ci:ci /srv
 
-ENV GIT_LFS_VERSION 3.0.2
-ENV GIT_LFS_HASH 796f5ea0259eabe57f94a8ad1bb0d46806168df30b135a65d88f8a7ee1409e0b
+ENV GIT_LFS_VERSION 3.1.2
+ENV GIT_LFS_HASH a10bb562658a65ad0e22f331bc43f2cb292a57d21c5b26f52794257e48fcbe10
 RUN mkdir -p /tmp/build && cd /tmp/build \
   && curl -sSL -o git-lfs.tgz https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-amd64-v${GIT_LFS_VERSION}.tar.gz \
   && echo "${GIT_LFS_HASH}  git-lfs.tgz" | sha256sum -c - \
@@ -91,7 +91,7 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
         boundary \
       && rm -rf /var/lib/apt/lists/*
 
-ENV BUILDKIT_VERSION v0.9.3
+ENV BUILDKIT_VERSION v0.10.0
 RUN cd /usr/local/bin && \
       wget -nv https://github.com/moby/buildkit/releases/download/${BUILDKIT_VERSION}/buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz && \
       tar --strip-components=1 -zxvf buildkit-${BUILDKIT_VERSION}.linux-amd64.tar.gz bin/ && \
@@ -100,7 +100,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.3.5
+ENV BUNDLER_VERSION 2.3.9
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
