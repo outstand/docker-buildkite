@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.34.0-ubuntu as agent
+FROM buildkite/agent:3.35.1-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -52,7 +52,7 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKER_COMPOSE_VERSION 2.2.3
+ENV DOCKER_COMPOSE_VERSION 2.4.1
 ENV COMPOSE_SWITCH_VERSION 1.0.4
 
 RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
@@ -100,7 +100,7 @@ RUN cd /usr/local/bin && \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.3.9
+ENV BUNDLER_VERSION 2.3.10
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
