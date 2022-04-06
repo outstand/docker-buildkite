@@ -52,7 +52,7 @@ RUN groupadd -g 1000 --system ci && \
       containerd.io \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOCKER_COMPOSE_VERSION 2.4.1
+ENV DOCKER_COMPOSE_VERSION 2.2.3
 ENV COMPOSE_SWITCH_VERSION 1.0.4
 
 RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
