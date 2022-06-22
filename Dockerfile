@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.36.0-ubuntu as agent
+FROM buildkite/agent:3.36.1-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -136,7 +136,7 @@ RUN set -eux; \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.3.14
+ENV BUNDLER_VERSION 2.3.16
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
