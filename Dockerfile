@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.36.1-ubuntu as agent
+FROM buildkite/agent:3.37.0-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -64,7 +64,7 @@ RUN set -eux; \
       ; \
       \
       apt-get clean; \
-      rm -f /var/lib/apt/lists/*_*/
+      rm -f /var/lib/apt/lists/*_*
 
 # This is the last known-good version of compose.
 ENV DOCKER_COMPOSE_VERSION 2.2.3
@@ -136,7 +136,7 @@ RUN set -eux; \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.3.16
+ENV BUNDLER_VERSION 2.3.18
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
