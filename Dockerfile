@@ -1,4 +1,4 @@
-FROM buildkite/agent:3.41.0-ubuntu as agent
+FROM buildkite/agent:3.43.1-ubuntu as agent
 FROM outstand/tini as tini
 FROM outstand/su-exec as su-exec
 
@@ -113,19 +113,7 @@ RUN set -eux; \
       ./aws/install; \
       rm awscliv2.zip
 
-RUN set -eux; \
-      \
-      curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -; \
-      apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"; \
-      apt-get update -y; \
-      apt-get install -y --no-install-recommends \
-        boundary \
-      ; \
-      \
-      apt-get clean; \
-      rm -f /var/lib/apt/lists/*_*/
-
-ENV BUILDKIT_VERSION v0.10.6
+ENV BUILDKIT_VERSION v0.11.2
 RUN set -eux; \
       \
       cd /usr/local/bin; \
@@ -136,7 +124,7 @@ RUN set -eux; \
 
 USER ci
 
-ENV BUNDLER_VERSION 2.3.26
+ENV BUNDLER_VERSION 2.4.6
 RUN gem install bundler -v ${BUNDLER_VERSION} --force --no-document
 
 USER root
